@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 
 
 # --- Configuration ---
@@ -368,6 +369,34 @@ def index():
     
     # Otherwise, show the public landing page
     return render_template('index.html')
+
+# --- SEO & SITEMAP ---
+
+@app.route('/sitemap.xml')
+def sitemap():
+    # List of public routes search engines should index
+    pages = []
+    
+    # 10 days ago (or current date) format for search engines
+    today = datetime.utcnow().strftime('%Y-%m-%d')
+    
+    # Add your public static pages
+    # Note: We use _external=True to generate the full "https://..." URL
+    public_routes = ['index', 'login', 'signup']
+    for route_name in public_routes:
+        pages.append({
+            'loc': url_for(route_name, _external=True),
+            'lastmod': today
+        })
+        
+    # Generate the XML text
+    sitemap_xml = render_template('sitemap.xml', pages=pages)
+    
+    # Tell the browser/search engine that this is an XML file, not HTML
+    response = make_response(sitemap_xml)
+    response.headers["Content-Type"] = "application/xml"
+    
+    return response
 
 # --- Authentication Routes ---
 
