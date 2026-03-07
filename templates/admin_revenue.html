@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    <div class="mb-4">
+        <a href="{{ url_for('profile') }}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to Profile
+        </a>
+        <h2 class="mt-2">Revenue & Sales Dashboard</h2>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card text-white bg-success shadow-sm border-0 h-100">
+                <div class="card-body py-4">
+                    <h5 class="card-title text-white-50"><i class="bi bi-cash-stack me-2"></i>Total Earnings</h5>
+                    <h1 class="display-4 fw-bold mb-0">₹{{ total_revenue }}</h1>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="card text-white bg-primary shadow-sm border-0 h-100">
+                <div class="card-body py-4">
+                    <h5 class="card-title text-white-50"><i class="bi bi-cart-check me-2"></i>Total Course Sales</h5>
+                    <h1 class="display-4 fw-bold mb-0">{{ total_sales }}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 border-0">
+            <h5 class="mb-0">Recent Transactions</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Transaction ID</th>
+                            <th>Student Name</th>
+                            <th>Course Purchased</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Amount Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales %}
+                        <tr>
+                            <td class="ps-4 text-muted">#TXN-{{ sale.id }}</td>
+                            <td>
+                                <strong>{{ sale.student.name }}</strong><br>
+                                <small class="text-muted">{{ sale.student.email }}</small>
+                            </td>
+                            <td>{{ sale.course.title }}</td>
+                            <td>
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success">Paid</span>
+                            </td>
+                            <td class="text-end pe-4 fw-bold text-success">
+                                ₹{{ sale.course.price }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-receipt fs-1 d-block mb-3 opacity-50"></i>
+                                No sales yet. Keep promoting your academy!
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

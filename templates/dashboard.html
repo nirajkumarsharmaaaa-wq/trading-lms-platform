@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>Welcome back, {{ user.name }}!</h2>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total Enrollments</h5>
+                    <p class="card-text fs-2">{{ total_enrollments }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Completed Certificates</h5>
+                    <p class="card-text fs-2">{{ completed_certs }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

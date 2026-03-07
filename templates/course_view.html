@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    
+    <div class="mb-3">
+        <a href="{{ url_for('my_courses') }}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <h3 class="fw-bold mb-3">{{ course.title }}</h3>
+            
+            <div class="card shadow-sm border-0 mb-4">
+                {% if current_lesson %}
+                    <div class="ratio ratio-16x9 w-100 bg-dark rounded-top">
+                        <iframe src="{{ current_lesson.video_url }}" title="Course Video" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-body">
+                        <h4 class="card-title">{{ current_lesson.title }}</h4>
+                        <span class="badge bg-secondary mb-3">Chapter: {{ current_lesson.chapter.title }}</span>
+                        <p class="text-muted">{{ course.description }}</p>
+                    </div>
+                {% else %}
+                    <div class="card-body text-center py-5 bg-light">
+                        <i class="bi bi-camera-video-off text-muted mb-3 d-block" style="font-size: 3rem;"></i>
+                        <h5>No Lessons Available</h5>
+                        <p class="text-muted">The admin has not added any video lessons to this course yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">Finished with the whole course?</h5>
+                        <small class="text-muted">Generate your certificate once you've watched all lessons.</small>
+                    </div>
+                    <form action="{{ url_for('complete_course', course_id=course.id) }}" method="POST">
+                        <button type="submit" class="btn btn-success" {% if enrollment.status == 'Completed' %}disabled{% endif %}>
+                            {% if enrollment.status == 'Completed' %} Certificate Earned {% else %} <i class="bi bi-award me-2"></i> Claim Certificate {% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i> Course Content</h5>
+                </div>
+                <div class="card-body p-0">
+                    
+                    <div class="accordion accordion-flush" id="courseAccordion">
+                        {% for chapter in course.chapters|sort(attribute='order') %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading-{{ chapter.id }}">
+                                    <button class="accordion-button {% if current_lesson and current_lesson.chapter_id != chapter.id %}collapsed{% endif %} fw-bold bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ chapter.id }}">
+                                        Section {{ loop.index }}: {{ chapter.title }}
+                                    </button>
+                                </h2>
+                                
+                                <div id="collapse-{{ chapter.id }}" class="accordion-collapse collapse {% if current_lesson and current_lesson.chapter_id == chapter.id %}show{% endif %}" data-bs-parent="#courseAccordion">
+                                    <div class="accordion-body p-0">
+                                        <div class="list-group list-group-flush">
+                                            
+                                            {% for lesson in chapter.lessons|sort(attribute='order') %}
+                                                <a href="{{ url_for('view_course', course_id=course.id, lesson_id=lesson.id) }}" 
+                                                   class="list-group-item list-group-item-action d-flex align-items-center py-3 border-start-0 border-end-0 
+                                                   {% if current_lesson and current_lesson.id == lesson.id %}bg-primary text-white border-primary{% endif %}">
+                                                    
+                                                    <i class="bi bi-play-circle-fill me-3 fs-5 {% if current_lesson and current_lesson.id == lesson.id %}text-white{% else %}text-primary{% endif %}"></i>
+                                                    <div>
+                                                        <span class="d-block">{{ loop.index }}. {{ lesson.title }}</span>
+                                                        <small class="{% if current_lesson and current_lesson.id == lesson.id %}text-light{% else %}text-muted{% endif %}"><i class="bi bi-youtube me-1"></i> Video</small>
+                                                    </div>
+                                                </a>
+                                            {% else %}
+                                                <div class="p-3 text-muted small text-center">No lessons added yet.</div>
+                                            {% endfor %}
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="p-4 text-center text-muted">
+                                <p class="mb-0">Content is being prepared.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

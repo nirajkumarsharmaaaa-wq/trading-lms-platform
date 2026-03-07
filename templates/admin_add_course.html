@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid max-w-4xl mx-auto">
+    <div class="mb-4">
+        <a href="{{ url_for('manage_courses') }}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to Courses
+        </a>
+        <h2 class="mt-2">Create New Course</h2>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <form method="POST" action="{{ url_for('add_course') }}">
+                
+                <div class="mb-3">
+                    <label for="title" class="form-label fw-bold">Course Title</label>
+                    <input type="text" class="form-control" id="title" name="title" required placeholder="e.g., Introduction to Python">
+                </div>
+
+                <div class="mb-3">
+                    <label for="content_type" class="form-label fw-bold">Content Type</label>
+                    <select class="form-select" id="content_type" name="content_type" required>
+                        <option value="" disabled selected>Select format...</option>
+                        <option value="Video">Video Lesson</option>
+                        <option value="Audio">Audio Lesson</option>
+                        <option value="PDF">PDF Document</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                            <label class="form-label fw-bold">Price (₹)</label>
+                            <input type="number" step="0.01" class="form-control" name="price" value="0.0" required>
+                            <div class="form-text">Set to 0 to make this course free.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Access Duration (Days)</label>
+                            <input type="number" class="form-control" name="access_days" value="0" required>
+                            <div class="form-text text-primary"><i class="bi bi-info-circle me-1"></i>Set to <strong>0</strong> for Lifetime Access. (e.g., type <strong>365</strong> for 1-Year Access).</div>
+                        </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label fw-bold">Course Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="5" required placeholder="Describe what the students will learn..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-cloud-arrow-up me-2"></i> Publish Course
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

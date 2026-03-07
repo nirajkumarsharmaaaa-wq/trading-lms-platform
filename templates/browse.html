@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    
+    <div class="p-4 p-md-5 mb-4 rounded text-bg-dark text-center">
+        <h1 class="display-5 fw-bold">Trader Niraj Sharma Academy</h1>
+        <p class="col-lg-8 mx-auto fs-5 mt-3">
+            Master the markets, build your skills, and take control of your financial future. Browse our premium masterclasses and free resources below.
+        </p>
+    </div>
+
+    <div class="row justify-content-center mb-5 mt-4">
+        <div class="col-md-8 col-lg-6">
+            <form action="{{ url_for('browse') }}" method="GET" class="d-flex shadow-sm rounded-pill overflow-hidden bg-white border">
+                <input type="text" name="q" class="form-control border-0 px-4 py-3 shadow-none" 
+                       placeholder="Search for masterclasses, topics, or skills..." 
+                       value="{{ search_query }}">
+                <button type="submit" class="btn btn-primary px-4 fw-bold rounded-end-pill">
+                    <i class="bi bi-search me-2"></i>Search
+                </button>
+            </form>
+            
+            {% if search_query %}
+                <div class="text-center mt-3">
+                    <span class="text-muted">Showing results for: <strong class="text-dark">"{{ search_query }}"</strong></span>
+                    <a href="{{ url_for('browse') }}" class="ms-3 text-decoration-none small text-danger fw-bold">
+                        <i class="bi bi-x-circle me-1"></i>Clear Search
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        
+        {% for course in courses %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 hover-shadow transition">
+                    <div class="bg-light text-center py-4 rounded-top border-bottom">
+                        {% if course.content_type == 'Video' %}
+                            <i class="bi bi-play-btn text-danger" style="font-size: 3rem;"></i>
+                        {% elif course.content_type == 'Audio' %}
+                            <i class="bi bi-file-music text-primary" style="font-size: 3rem;"></i>
+                        {% else %}
+                            <i class="bi bi-file-earmark-pdf text-warning" style="font-size: 3rem;"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-secondary">{{ course.content_type }}</span>
+                            {% if course.price > 0 %}
+                                <span class="fs-5 fw-bold text-success">₹{{ course.price }}</span>
+                            {% else %}
+                                <span class="fs-5 fw-bold text-primary">Free</span>
+                            {% endif %}
+                            
+                        </div>
+                        <h5 class="card-title fw-bold mt-2">{{ course.title }}</h5>
+                        
+                        <div class="mb-2">
+                            {% if course.access_days == 0 %}
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="bi bi-infinity me-1"></i> Lifetime Access</span>
+                            {% else %}
+                                <span class="badge bg-warning bg-opacity-10 text-dark border border-warning"><i class="bi bi-clock-history me-1"></i> {{ course.access_days }}-Day Access</span>
+                            {% endif %}
+                        </div>
+                        
+                        <h5 class="card-title fw-bold mt-2">{{ course.title }}</h5>
+                        <p class="card-text text-muted small flex-grow-1">{{ course.description[:120] }}...</p>
+                        
+                        <div class="mt-3">
+                            {% if course.id in enrolled_course_ids %}
+                                <a href="{{ url_for('view_course', course_id=course.id) }}" class="btn btn-outline-success w-100">
+                                    <i class="bi bi-play-circle me-1"></i> Go to Classroom
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('enroll', course_id=course.id) }}" class="btn btn-primary w-100">
+                                    {% if course.price > 0 %} 
+                                        <i class="bi bi-cart3 me-1"></i> Buy Now 
+                                    {% else %} 
+                                        Enroll for Free 
+                                    {% endif %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <h4 class="text-muted">No courses published yet. Check back soon!</h4>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    /* Add a smooth hover effect to the course cards */
+    .hover-shadow.transition {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+</style>
+{% endblock %}

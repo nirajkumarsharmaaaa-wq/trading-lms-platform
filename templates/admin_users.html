@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    <div class="mb-4">
+        <a href="{{ url_for('profile') }}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to Profile
+        </a>
+        <h2 class="mt-2">Student Management</h2>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td class="ps-4 text-muted">#{{ u.id }}</td>
+                            <td>
+                                <strong>{{ u.name }}</strong>
+                            </td>
+                            <td>{{ u.email }}</td>
+                            <td>
+                                {% if u.is_admin %}
+                                    <span class="badge bg-danger">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-primary">Student</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                {% if u.id != current_user.id %}
+                                    <a href="{{ url_for('delete_user', user_id=u.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this student and all their course progress?');">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">You (Active)</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

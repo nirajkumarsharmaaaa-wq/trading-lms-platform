@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    <div class="mb-4">
+        <a href="{{ url_for('profile') }}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to Profile
+        </a>
+        <h2 class="mt-2">Support Tickets</h2>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4">Status</th>
+                            <th>Student</th>
+                            <th>Subject & Message</th>
+                            <th>Date</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in tickets %}
+                        <tr>
+                            <td class="ps-4">
+                                {% if t.status == 'Open' %}
+                                    <span class="badge bg-warning text-dark">Open</span>
+                                {% else %}
+                                    <span class="badge bg-success">Closed</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ t.user.name }}</strong><br>
+                                <a href="mailto:{{ t.user.email }}" class="small text-decoration-none">{{ t.user.email }}</a>
+                            </td>
+                            <td style="max-width: 300px;">
+                                <strong>{{ t.subject }}</strong>
+                                <p class="text-muted small mb-0 text-truncate">{{ t.message }}</p>
+                            </td>
+                            <td class="text-muted small">{{ t.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td class="text-end pe-4">
+                                {% if t.status == 'Open' %}
+                                    <a href="{{ url_for('close_ticket', ticket_id=t.id) }}" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-check-circle"></i> Mark Closed
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">Resolved</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">No support tickets found!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

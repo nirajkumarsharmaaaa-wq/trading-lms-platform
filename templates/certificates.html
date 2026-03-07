@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Certificates</h2>
+        <span class="text-muted">Total Earned: {{ certificates|length }}</span>
+    </div>
+
+    <div class="row">
+        {% for cert in certificates %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0 border-top border-warning border-4">
+                    <div class="card-body text-center">
+                        <i class="bi bi-award-fill text-warning" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">{{ cert.course.title }}</h5>
+                        <p class="text-muted small mb-1">Issued on: {{ cert.issue_date.strftime('%B %d, %Y') }}</p>
+                        <p class="badge bg-light text-dark border mt-2">ID: CERT-{{ cert.id }}{{ cert.user_id }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 pb-3 text-center">
+                        <button class="btn btn-outline-secondary btn-sm w-75"><i class="bi bi-download me-2"></i>Download PDF</button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="text-muted mb-3">
+                    <i class="bi bi-journal-x" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="text-secondary">No certificates yet</h5>
+                <p class="text-muted">Complete your first course in the library to earn a certificate.</p>
+                <a href="{{ url_for('browse') }}" class="btn btn-primary mt-2">Explore Courses</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

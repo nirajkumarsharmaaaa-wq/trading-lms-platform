@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid max-w-4xl mx-auto">
+    <h2 class="mb-4">My Profile</h2>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0 text-center pt-4 pb-3">
+                <div class="card-body">
+                    <i class="bi bi-person-circle text-secondary" style="font-size: 5rem;"></i>
+                    <h4 class="card-title mt-3">{{ user.name }}</h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                    
+                    {% if user.is_admin %}
+                        <span class="badge bg-danger px-3 py-2 mt-2"><i class="bi bi-shield-lock me-1"></i> Administrator</span>
+                    {% else %}
+                        <span class="badge bg-primary px-3 py-2 mt-2"><i class="bi bi-mortarboard me-1"></i> Student</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                    <h5 class="card-title">Edit Profile Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('profile') }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label text-muted small fw-bold">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label text-muted small fw-bold">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                        </div>
+
+                        <hr class="my-4">
+                        
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label text-muted small fw-bold">New Password (Optional)</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Leave blank to keep current password">
+                            <div class="form-text">Only fill this out if you want to change your password.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-2"></i> Save Changes
+                        </button>
+                    </form>
+                    <div class="col-md-8">
+            <div class="card shadow-sm border-0 mb-4">
+                </div>
+
+            {% if user.is_admin %}
+            <div class="card shadow-sm border-0 border-top border-danger border-4">
+                <div class="card-header bg-white pt-4 pb-0 border-0">
+                    <h5 class="card-title text-danger"><i class="bi bi-sliders me-2"></i>Superadmin Control Center</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-4">Manage your academy's curriculum, students, and platform settings from here.</p>
+                    
+                  <div class="row g-3">
+                        <div class="col-sm-6">
+                            <a href="{{ url_for('manage_courses') }}" class="btn btn-outline-dark w-100 py-3 text-start d-flex align-items-center h-100">
+                                <i class="bi bi-journal-richtext fs-3 me-3 text-primary"></i>
+                                <div>
+                                    <strong class="d-block">Courses</strong>
+                                    <small class="text-muted">Edit curriculum</small>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <div class="col-sm-6">
+                            <a href="{{ url_for('manage_users') }}" class="btn btn-outline-dark w-100 py-3 text-start d-flex align-items-center h-100">
+                                <i class="bi bi-people fs-3 me-3 text-success"></i>
+                                <div>
+                                    <strong class="d-block">Students</strong>
+                                    <small class="text-muted">Manage accounts</small>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <a href="{{ url_for('admin_revenue') }}" class="btn btn-outline-dark w-100 py-3 text-start d-flex align-items-center h-100">
+                                <i class="bi bi-graph-up-arrow fs-3 me-3 text-danger"></i>
+                                <div>
+                                    <strong class="d-block">Revenue</strong>
+                                    <small class="text-muted">Track sales</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="{{ url_for('manage_tickets') }}" class="btn btn-outline-dark w-100 py-3 text-start d-flex align-items-center h-100">
+                                <i class="bi bi-headset fs-3 me-3 text-warning"></i>
+                                <div>
+                                    <strong class="d-block">Support Tickets</strong>
+                                    <small class="text-muted">Resolve student issues</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                        
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

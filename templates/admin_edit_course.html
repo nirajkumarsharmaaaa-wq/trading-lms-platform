@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    <div class="mb-4">
+        <a href="{{ url_for('manage_courses') }}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to All Courses
+        </a>
+        <h2 class="mt-2">Course Builder</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Edit Course Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('edit_course', course_id=course.id) }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Title</label>
+                            <input type="text" class="form-control" name="title" value="{{ course.title }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Content Type</label>
+                            <select class="form-select" name="content_type" required>
+                                <option value="Video" {% if course.content_type == 'Video' %}selected{% endif %}>Video</option>
+                                <option value="Audio" {% if course.content_type == 'Audio' %}selected{% endif %}>Audio</option>
+                                <option value="PDF" {% if course.content_type == 'PDF' %}selected{% endif %}>PDF</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Price (₹)</label>
+                            <input type="number" step="0.01" class="form-control" name="price" value="{{ course.price }}" required>
+                            <div class="form-text">Set to 0 to make this course free.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Access Duration (Days)</label>
+                            <input type="number" class="form-control" name="access_days" value="{{ course.access_days }}" required>
+                            <div class="form-text text-primary"><i class="bi bi-info-circle me-1"></i>Set to <strong>0</strong> for Lifetime Access. (e.g., type <strong>365</strong> for 1-Year Access).</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Description</label>
+                            <textarea class="form-control" name="description" rows="5" required>{{ course.description }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Curriculum</h5>
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addChapterModal">
+                        <i class="bi bi-plus-circle me-1"></i> Add Chapter
+                    </button>
+                </div>
+                <div class="card-body bg-light">
+                    
+                    {% for chapter in course.chapters|sort(attribute='order') %}
+                        <div class="card mb-3 border-0 shadow-sm">
+                            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                                <strong>Chapter {{ chapter.order }}: {{ chapter.title }}</strong>
+                                <div>
+                                    <button class="btn btn-sm btn-light py-0 me-2" data-bs-toggle="modal" data-bs-target="#addLessonModal{{ chapter.id }}">
+                                        + Lesson
+                                    </button>
+                                    <a href="{{ url_for('delete_chapter', chapter_id=chapter.id) }}" class="text-danger" onclick="return confirm('Delete this entire chapter?');"><i class="bi bi-trash"></i></a>
+                                </div>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {% for lesson in chapter.lessons|sort(attribute='order') %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center bg-white">
+                                        <span><i class="bi bi-play-circle text-primary me-2"></i> {{ lesson.order }}. {{ lesson.title }}</span>
+                                        <a href="{{ url_for('delete_lesson', lesson_id=lesson.id) }}" class="text-danger small" onclick="return confirm('Delete this lesson?');"><i class="bi bi-x-circle"></i> Remove</a>
+                                    </li>
+                                {% else %}
+                                    <li class="list-group-item text-muted small py-3 text-center">No lessons in this chapter yet.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="modal fade" id="addLessonModal{{ chapter.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form method="POST" action="{{ url_for('add_lesson', chapter_id=chapter.id) }}">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Add Lesson to "{{ chapter.title }}"</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Lesson Title</label>
+                                                <input type="text" class="form-control" name="title" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">YouTube Embed URL</label>
+                                                <input type="url" class="form-control" name="video_url" placeholder="https://www.youtube.com/embed/..." required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Order (e.g., 1, 2, 3)</label>
+                                                <input type="number" class="form-control" name="order" value="1" required>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Save Lesson</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <p>No chapters added yet. Start building your curriculum!</p>
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addChapterModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('add_chapter', course_id=course.id) }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Chapter</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Chapter Title</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Order Number (e.g., 1, 2, 3)</label>
+                        <input type="number" class="form-control" name="order" value="1" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Create Chapter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

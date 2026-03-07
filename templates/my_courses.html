@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">My Courses</h2>
+
+    <ul class="nav nav-tabs" id="myCourseTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="started-tab" data-bs-toggle="tab" data-bs-target="#started" type="button" role="tab" aria-controls="started" aria-selected="true">
+                Started <span class="badge bg-secondary ms-1">{{ started|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="inprogress-tab" data-bs-toggle="tab" data-bs-target="#inprogress" type="button" role="tab" aria-controls="inprogress" aria-selected="false">
+                In Progress <span class="badge bg-primary ms-1">{{ in_progress|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab" aria-controls="completed" aria-selected="false">
+                Completed <span class="badge bg-success ms-1">{{ completed|length }}</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-4" id="myCourseTabsContent">
+        
+        <div class="tab-pane fade show active" id="started" role="tabpanel" aria-labelledby="started-tab">
+            <div class="row">
+                {% for enrollment in started %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-body">
+                                <span class="badge bg-light text-dark mb-2 border">{{ enrollment.course.content_type }}</span>
+                                <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                                <p class="card-text text-muted small">{{ enrollment.course.description[:100] }}...</p>
+                            </div>
+                            <div class="card-footer bg-white border-top-0 pt-0">
+                                <a href="{{ url_for('view_course', course_id=enrollment.course_id) }}" class="btn btn-outline-primary w-100">Begin Learning</a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">You haven't started any courses yet.</p>
+                        <a href="{{ url_for('browse') }}" class="btn btn-primary">Browse Courses</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="inprogress" role="tabpanel" aria-labelledby="inprogress-tab">
+            <div class="row">
+                {% for enrollment in in_progress %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 border-start border-primary border-4">
+                            <div class="card-body">
+                                <span class="badge bg-light text-dark mb-2 border">{{ enrollment.course.content_type }}</span>
+                                <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                                
+                                <div class="progress mt-3" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <small class="text-muted mt-1 d-block">50% Complete</small>
+                            </div>
+                            <div class="card-footer bg-white border-top-0 pt-0">
+                                <a href="{{ url_for('view_course', course_id=enrollment.course_id) }}" class="btn btn-primary w-100">Resume Course</a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">You have no courses currently in progress.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+            <div class="row">
+                {% for enrollment in completed %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 border-start border-success border-4 bg-light">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-white text-dark border">{{ enrollment.course.content_type }}</span>
+                                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                </div>
+                                <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                                <p class="card-text text-muted small">You have successfully mastered this material.</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0 pt-0">
+                                <a href="{{ url_for('my_certificates') }}" class="btn btn-success w-100">View Certificate</a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">You haven't completed any courses yet. Keep going!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
