@@ -4,6 +4,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
+import os
+from werkzeug.utils import secure_filename
 
 
 # --- Configuration ---
@@ -12,7 +14,15 @@ app.config['SECRET_KEY'] = 'your_super_secret_key_here' # Change in production
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lms.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# --- FILE UPLOAD CONFIGURATION ---
+UPLOAD_FOLDER = 'static/uploads/thumbnails'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Automatically create the folder if it doesn't exist yet
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 import razorpay
+
 
 
 # Replace with your actual Test API keys from the Razorpay Dashboard
@@ -129,6 +139,8 @@ class Course(db.Model):
     price = db.Column(db.Float, default=0.0) 
     # NEW: 0 means Lifetime Access. 365 means 1 year.
     access_days = db.Column(db.Integer, default=0)
+    # NEW: Store the image filename. 
+    thumbnail = db.Column(db.String(255), default='default.jpg')
     # Link to chapters:
     chapters = db.relationship('Chapter', backref='course', lazy=True, cascade="all, delete-orphan")
 
@@ -261,6 +273,16 @@ def add_course():
         # Save the new course directly to the database
         new_course = Course(title=title, description=description, content_type=content_type)
         db.session.add(new_course)
+        
+        # Handle the Thumbnail Upload
+        file = request.files.get('thumbnail')
+        if file and file.filename != '':
+            # Secure the filename to prevent directory traversal attacks
+            filename = secure_filename(file.filename)
+            # Save the file to our static/uploads folder
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # Update the database record with the new filename
+            course.thumbnail = filename
         db.session.commit()
         
         flash('New course successfully published!')
@@ -301,6 +323,16 @@ def edit_course(course_id):
         # ADD THIS NEW LINE:
         course.access_days = request.form.get('access_days', 0, type=int)
         
+        # Handle the Thumbnail Upload
+        file = request.files.get('thumbnail')
+        if file and file.filename != '':
+            # Secure the filename to prevent directory traversal attacks
+            filename = secure_filename(file.filename)
+            # Save the file to our static/uploads folder
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # Update the database record with the new filename
+            course.thumbnail = filename
+            
         db.session.commit()
         flash('Course details updated successfully!')
         return redirect(url_for('edit_course', course_id=course.id))
@@ -374,6 +406,7 @@ def index():
 
 @app.route('/sitemap.xml')
 def sitemap():
+    
     # List of public routes search engines should index
     pages = []
     
@@ -396,7 +429,25 @@ def sitemap():
     response = make_response(sitemap_xml)
     response.headers["Content-Type"] = "application/xml"
     
+    
     return response
+
+    #Robot.txt
+@app.route('/robots.txt')
+def robots_txt():
+    # Tell all search engines to scan the whole site, and point them to your sitemap
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /dashboard", # Keep Google out of private student areas
+        "Disallow: /admin",     # Keep Google out of admin panels
+        f"Sitemap: {url_for('sitemap', _external=True)}"
+    ]
+    
+    response = make_response("\n".join(lines))
+    response.headers["Content-Type"] = "text/plain"
+    return response
+
 
 # --- Authentication Routes ---
 

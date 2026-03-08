@@ -11,10 +11,15 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
-            <form method="POST" action="{{ url_for('add_course') }}">
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_course') }}">
                 
                 <div class="mb-3">
                     <label for="title" class="form-label fw-bold">Course Title</label>
+                    <div class="mb-3">
+                            <label class="form-label fw-bold">Course Thumbnail</label>
+                            <input class="form-control" type="file" name="thumbnail" accept="image/*">
+                            <div class="form-text">Recommended size: 1280x720 pixels (16:9 ratio).</div>
+                        </div>
                     <input type="text" class="form-control" id="title" name="title" required placeholder="e.g., Introduction to Python">
                 </div>
 
